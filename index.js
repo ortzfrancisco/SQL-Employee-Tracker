@@ -1,18 +1,7 @@
 // Variable Definitions & Dependencies
 const inquirer = require('inquirer');
-const mysql = require('mysql');
-// Connect to database
-const db = mysql.createConnection(
-    {
-        host: 'localhost',
-        // MySQL username,
-        user: 'root',
-        // MySQL password
-        password: 'Elpueblito1',
-        database: 'employee'
-    },
-    console.log(`Connected to the courses_db database.`)
-);
+const db = require('./db/connection');
+
 // Start server after DB connection
 db.connect(err => {
     if (err) throw err;
@@ -258,7 +247,7 @@ var employee_tracker = function () {
                         }
                     }
 
-                    db.query(`UPDATE employee SET ? WHERE ?`, [{ role_id: role }, { last_name: name }], (err, result) => {
+                    db.query(`UPDATE employee SET ? WHERE ?`, [{role_id: role}, {last_name: name}], (err, result) => {
                         if (err) throw err;
                         console.log(`Updated ${answers.employee} role to the database.`)
                         employee_tracker();
