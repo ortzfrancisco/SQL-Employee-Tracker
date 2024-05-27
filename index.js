@@ -76,7 +76,7 @@ function viewAllDepartments() {
 }
 
 function viewAllRoles() {
-    const query = 'SELECT role.id, role.title, role.salary, department.name AS department FROM role LEFT JOIN department ON role.department_id = department.id';
+    const query = 'SELECT roles.id, roles.title, roles.salary, department.name AS department FROM roles LEFT JOIN department ON roles.department_id = department.id';
     connection.query(query, (err, results) => {
         if (err) throw err;
         console.table(results);
@@ -86,11 +86,11 @@ function viewAllRoles() {
 
 function viewAllEmployees() {
     const query = `
-        SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, 
+        SELECT employee.id, employee.first_name, employee.last_name, roles.title, department.name AS department, roles.salary, 
         CONCAT(manager.first_name, ' ', manager.last_name) AS manager 
         FROM employee 
-        LEFT JOIN role ON employee.role_id = role.id 
-        LEFT JOIN department ON role.department_id = department.id 
+        LEFT JOIN roles ON employee.roles_id = roles.id 
+        LEFT JOIN department ON roles.department_id = department.id 
         LEFT JOIN employee manager ON manager.id = employee.manager_id`;
     connection.query(query, (err, results) => {
         if (err) throw err;
@@ -140,7 +140,7 @@ function addRole() {
                 }))
             }
         ]).then(answers => {
-            const query = 'INSERT INTO role SET ?';
+            const query = 'INSERT INTO roles SET ?';
             connection.query(query, answers, (err, results) => {
                 if (err) throw err;
                 console.log(`Added ${answers.title} to the database`);
@@ -151,7 +151,7 @@ function addRole() {
 }
 
 function addEmployee() {
-    connection.query('SELECT * FROM role', (err, roles) => {
+    connection.query('SELECT * FROM roles', (err, roles) => {
         if (err) throw err;
         connection.query('SELECT * FROM employee', (err, employees) => {
             if (err) throw err;
@@ -168,11 +168,11 @@ function addEmployee() {
                 },
                 {
                     type: 'list',
-                    name: 'role_id',
-                    message: 'Select the role for the employee:',
-                    choices: roles.map(role => ({
-                        name: role.title,
-                        value: role.id
+                    name: 'roles_id',
+                    message: 'Select the roles for the employee:',
+                    choices: roles.map(roles => ({
+                        name: roles.title,
+                        value: roles.id
                     }))
                 },
                 {
@@ -202,7 +202,7 @@ function addEmployee() {
 function updateEmployeeRole() {
     connection.query('SELECT * FROM employee', (err, employees) => {
         if (err) throw err;
-        connection.query('SELECT * FROM role', (err, roles) => {
+        connection.query('SELECT * FROM roles', (err, roles) => {
             if (err) throw err;
             inquirer.prompt([
                 {
@@ -224,7 +224,7 @@ function updateEmployeeRole() {
                     }))
                 }
             ]).then(answers => {
-                const query = 'UPDATE employee SET role_id = ? WHERE id = ?';
+                const query = 'UPDATE employee SET roles_id = ? WHERE id = ?';
                 connection.query(query, [answers.role_id, answers.employee_id], (err, results) => {
                     if (err) throw err;
                     console.log('Updated employee\'s role');
